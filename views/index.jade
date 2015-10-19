@@ -1,11 +1,14 @@
 extends layout
 
 block content
-  h1= title
-  if statusSignedIn
-    p= session_id + ", you are signed in."
+  h1 G Class
+
+  if session_id
+    p 
+      a(href= '/new') Add new student
     p
-      a(href= '/logout') Logout
+      a(href= '/all_students') List of all students
+
   else
     p
       a(href='/signup') Sign Up

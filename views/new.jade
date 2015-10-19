@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+  h1 Add new student
+  form(id='newStudentForm', action='/new', method='POST')
+    p
+      | Name
+      input(id='inputName', name='inputName')
+    p
+      | Phone
+      input(id='inputPhone', name='inputPhone')
+    p 
+      button(id='newStudent', type='submit') Add 

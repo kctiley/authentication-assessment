@@ -1,10 +1,10 @@
 extends layout
 
 block content
-  h1 G Class
+
   include error.jade
 
-  if signinPage
+  if signInPage
     h1 Sign In
     form(id='signinForm', action='/signin', method='POST')
       p

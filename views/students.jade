@@ -1,0 +1,9 @@
+extends layout
+
+block content
+
+  p Students
+  for each in allStudents
+    p
+      a(href='/students/' + each.name)=each.name
+    
