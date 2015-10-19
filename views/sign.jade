@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  h1= title
+  h1= subtitle
+  if errors
+    for each in errors
+      p=each
+
+  if user
+    p=user
+  else
+    form(id='signupForm', action='/signup', method='POST')
+      p
+        | email
+        input(id='inputEmail' name='inputEmail' type='text')
+      p
+        | password
+        input(id='inputPassword' name='inputPassword' type='text')
+      p
+        button(type='submit') Submit

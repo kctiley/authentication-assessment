@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= title
+
+  if user
+    p=user
+  else
+    p
+      a(href='/signup') Sign Up
+    p
+      a(href='/signin') Sign In
