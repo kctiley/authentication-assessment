@@ -3,12 +3,18 @@ extends layout
 block content
   h1= title
   h1= subtitle
-  if errors
-    for each in errors
-      p=each
+  include error.jade
 
-  if user
-    p=user
+  if signin
+    form(id='signinForm', action='/signin', method='POST')
+      p
+        | email
+        input(id='inputEmail' name='inputEmail' type='text')
+      p
+        | password
+        input(id='inputPassword' name='inputPassword' type='text')
+      p
+        button(type='submit') Sign In
   else
     form(id='signupForm', action='/signup', method='POST')
       p
@@ -18,4 +24,4 @@ block content
         | password
         input(id='inputPassword' name='inputPassword' type='text')
       p
-        button(type='submit') Submit
+        button(type='submit') Sign Up
