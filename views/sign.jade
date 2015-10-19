@@ -1,8 +1,10 @@
 extends layout
 
 block content
-
-  include error.jade
+  
+  if errors
+    for each in errors
+      p(style='color: red')= each
 
   if signInPage
     h1 Sign In

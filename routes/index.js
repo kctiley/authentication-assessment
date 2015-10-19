@@ -87,9 +87,29 @@ router.get('/new', function(req, res, next){
 })
 
 router.post('/new', function(req, res, next){
-  studentsCollection.insert({name: req.body.inputName, phone: req.body.inputPhone}, function(err, record){
-    res.render('index', {statusSignedIn: true,  session_id: req.session.email})
-  })
+  var errors = [];
+  if(!req.body.inputName){
+    errors.push('Name must be entered')
+  }
+  if(!req.body.inputPhone){
+    errors.push('Phone number must be entered')
+  }
+  if (errors.length > 0){
+    res.render('new', {session_id: req.session.email, errors: errors})
+  }
+  else{
+    studentsCollection.findOne({name: req.body.inputName}, function(err, record){
+      if(record){
+        errors.push('Email not available')
+        res.render('new', {session_id: req.session.email, errors: errors})
+      }
+      else{   
+        studentsCollection.insert({name: req.body.inputName, phone: req.body.inputPhone}, function(err, record){
+          res.render('index', {statusSignedIn: true,  session_id: req.session.email})
+        }) 
+      }  
+    })
+  }  
 })
 
 router.get('/all_students', function(req, res, next){

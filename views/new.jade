@@ -1,6 +1,9 @@
 extends layout
 
 block content
+  if errors
+    for each in errors
+      p(style='color: red')=each
 
   h1 Add new student
   form(id='newStudentForm', action='/new', method='POST')
