@@ -1,11 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  h1= subtitle
+  h1 G Class
   include error.jade
 
-  if signin
+  if signinPage
+    h1 Sign In
     form(id='signinForm', action='/signin', method='POST')
       p
         | email
@@ -16,6 +16,7 @@ block content
       p
         button(type='submit') Sign In
   else
+    h1 Sign Up
     form(id='signupForm', action='/signup', method='POST')
       p
         | email

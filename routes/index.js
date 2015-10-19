@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var db = require('monk')('localhost/authentication-assessment');
 var usersCollection = db.get('usersCollection');
+var bcrypt = require('bcrypt');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -10,7 +11,7 @@ router.get('/', function(req, res, next) {
 
 /* GET SignUp */
 router.get('/signup', function(req, res, next) {
-  res.render('sign', { title: 'G Class' , subtitle: "SignUp"});
+  res.render('sign', { title: 'G Class'});
 });
 
 /* POST SignUp */
@@ -21,16 +22,18 @@ router.post('/signup', function(req, res, next) {
   if(!req.body.inputPassword.trim())
     errors.push('Must enter password')
   if (errors.length > 0)
-    res.render('sign', {title: 'G Class', subtitle: 'Try again', errors: errors})
+    res.render('sign', {title: 'G Class - Try again', errors: errors})
   else{
     usersCollection.find({email: req.body.inputEmail}, function(err, record){
       if(record.length){
         errors.push('Email not available');
-        res.render('sign', {title: 'G Class', subtitle: 'Try again', errors: errors})
+        res.render('sign', {title: 'G Class - Try again', errors: errors})
       }
       else{
-        usersCollection.insert({email: req.body.inputEmail, password: req.body.inputPassword}, function(err, record){
-          res.render('index', { title: 'G Class' , subtitle: 'Signed In!', user: "user true"});
+        req.session.email = req.body.inputEmail;
+        var hashedPassword = bcrypt.hashSync(req.body.inputPassword, 8);
+        usersCollection.insert({email: req.body.inputEmail, hashedPassword: hashedPassword}, function(err, record){
+          res.render('index', { title: 'G Class', statusSignedIn: true, session_id: req.session.email});
         })
       }
     })
@@ -39,7 +42,7 @@ router.post('/signup', function(req, res, next) {
 
 /* GET SignIn */
 router.get('/signin', function(req, res, next) {
-  res.render('sign', { title: 'G Class' , subtitle: "SignIn", signin: true});
+  res.render('sign', { title: 'G Class', signinPage: true});
 });
 
 
@@ -51,38 +54,33 @@ router.post('/signin', function(req, res, next) {
   if(!req.body.inputPassword.trim())
     errors.push('Must enter password')
   if (errors.length > 0)
-    res.render('sign', {title: 'G Class', subtitle: 'Try again', errors: errors})
+    res.render('sign', {title: 'G Class - Try again', errors: errors})
   else{
     usersCollection.findOne({email: req.body.inputEmail}, function(err, record){
       if(!record){
         errors.push('Record not found. Please check that your email is correct.');
-        res.render('sign', {title: 'G Class', subtitle: 'Try again', errors: errors, signin:true})
+        res.render('sign', {title: 'G Class - Try again', errors: errors, signinPage:true})
       }
       else{
-        if(record.password !== req.body.inputPassword){
-          errors.push('Incorrect password');
-          res.render('sign', {title: 'G Class', subtitle: 'Try again', errors: errors, signin:true}) 
+        if(bcrypt.compareSync(req.body.inputPassword, record.hashedPassword)){
+          req.session.email = req.body.inputEmail;
+          res.render('index', {title: 'G Class', session_id: req.session.email, statusSignedIn: true})
         }
         else{
-          res.render('index', {title: 'G Class', subtitle: 'Signed In!', user: "You're signed in " + req.body.inputEmail})
+          errors.push('Incorrect password');
+          res.render('sign', {title: 'G Class - Try again', errors: errors, signinPage:true}) 
         }
       }
-      // if(record){
-      //   console.log("Record" + record.password)
-      //   if(record.password == req.body.inputPassword){
-      //     res.render('index', {title: 'G Class', subtitle: 'Signed In!', signin: true})
-      //   }
-      //   else{
-      //     errors.push('Incorrect password')
-      //   }
-      // }
-      // else{
-      //   errors.push('Record not found. Please check that your email is correct.')
-      // }
-      // res.render('sign', {title: 'G Class', subtitle: 'Try again', errors: errors, signin:true})
     })
   }
 });
+
+
+router.get('/logout', function(req, res, next){
+  req.session = null;
+  res.redirect('/')
+})
+
 
 
 
